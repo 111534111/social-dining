@@ -1,19 +1,9 @@
 package com.example.socialdining.model;
 
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.CollectionTable;
-import jakarta.persistence.Column;
-import jakarta.persistence.ElementCollection;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Data;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -21,30 +11,37 @@ import java.util.Set;
 @Data
 public class Dinner {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private String title;
-    private String location;
+
+    // 公開顯示到區的地址
+    private String publicAddress;
+
+    // 完整地址，只在訂購完成後顯示
+    private String fullAddress;
+
     private String cuisine;
     private Integer capacity;
 
     @Column(length = 1000)
     private String description;
 
-    private String imagePath;
+    // 封面照檔名
+    private String coverImagePath;
 
-    @ElementCollection(fetch = FetchType.EAGER)
+    // 其餘照片檔名
+    @ElementCollection
+    @CollectionTable(name = "dinner_images", joinColumns = @JoinColumn(name = "dinner_id"))
+    @Column(name = "path")
+    private List<String> imagePaths;
+
+    @ElementCollection
     @CollectionTable(name = "dinner_dates", joinColumns = @JoinColumn(name = "dinner_id"))
     @Column(name = "date")
     private Set<LocalDate> availableDates;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
+    @ManyToOne @JoinColumn(name = "user_id", nullable = false)
     private User owner;
-
-    @ManyToOne(cascade = CascadeType.PERSIST)
-    @JoinColumn(name = "address_id")
-    private Address address;
 }

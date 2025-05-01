@@ -7,306 +7,242 @@
   <style>
     :root {
       --primary: #2D4C4C;
-      --secondary: #E9DB7D;
-      --background: #F8F9FA;
-      --input-bg: #FDF6E3;
+      --accent: #E9DB7D;
+      --bg: #F8F9FA;
+      --input-bg: #fff;
+      --text: #333;
     }
+    * { box-sizing: border-box; }
     body {
       margin: 0;
       padding: 0;
-      font-family: Arial, sans-serif;
-      background-color: #F5F5F5;
-      min-height: 100vh;
+      font-family: 'Segoe UI', Tahoma, sans-serif;
+      background: var(--bg);
       display: flex;
-      flex-direction: column;
+      justify-content: center;
+      padding: 30px 0;
     }
-    header {
-      display: flex;
-      align-items: center;
-      background-color: #f58549;
-      color: #fff;
-      padding: 15px 30px;
-    }
-    .logo { font-size: 28px; font-weight: bold; margin-right: 40px; }
-    nav ul { list-style: none; margin: 0; padding: 0; display: flex; gap: 10px; }
-    nav a { text-decoration: none; color: #fff; background-color: #f7a573; padding: 8px 12px; border-radius: 4px; }
-    nav a:hover, nav a.active { background-color: #dd885f; }
-    .logout-container { margin-left: auto; }
-    .logout-container button { background-color: #e23b3b; border: none; color: #fff; padding: 8px 12px; border-radius: 4px; cursor: pointer; }
-    .logout-container button:hover { background-color: #b72f2f; }
-
-    .main-container {
+    .container {
       width: 100%;
       max-width: 800px;
-      margin: 100px auto 40px;
-      padding: 20px;
-      background-color: #fff;
-      border: 1px solid #ddd;
+      background: #fff;
       border-radius: 8px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      overflow: hidden;
+    }
+    header {
+      background: var(--primary);
+      color: #fff;
+      padding: 12px 20px;
+      display: flex;
+      align-items: center;
+    }
+    .logo { font-size: 24px; font-weight: bold; flex: 1; }
+    nav ul {
+      list-style: none; margin: 0; padding: 0;
+      display: flex; gap: 12px;
+    }
+    nav a {
+      color: #fff; text-decoration: none;
+      padding: 6px 10px; border-radius: 4px;
+      transition: background .2s;
+    }
+    nav a:hover, nav a.active { background: #dd885f; }
+
+    .main {
+      padding: 20px;
     }
 
-    .inner-tabs { display: flex; justify-content: center; gap: 20px; margin-bottom: 20px; border-bottom: 1px solid #ddd; }
-    .inner-tabs button { background: none; border: none; font-size: 16px; padding: 8px 12px; cursor: pointer; border-bottom: 2px solid transparent; }
-    .inner-tabs button.active { color: var(--primary); border-color: var(--primary); }
+    .tabs {
+      display: flex; gap: 20px;
+      border-bottom: 2px solid #eee;
+      margin-bottom: 20px;
+    }
+    .tabs button {
+      background: none; border: none;
+      padding: 8px 12px; font-size: 16px;
+      cursor: pointer; border-bottom: 3px solid transparent;
+      transition: color .2s, border-color .2s;
+    }
+    .tabs button.active {
+      color: var(--primary);
+      border-color: var(--primary);
+    }
 
-    .tab-content { display: none; }
-    .tab-content.active { display: block; }
-
-    .dinner-form form { display: flex; flex-direction: column; gap: 15px; }
-    .dinner-form label { font-weight: bold; font-size: 14px; }
-    .dinner-form input,
-    .dinner-form textarea { padding: 8px; font-size: 14px; border: 1px solid #ccc; border-radius: 4px; background: var(--input-bg); }
-    .dinner-form textarea { resize: vertical; min-height: 80px; }
-
-    #dateContainer { display: flex; flex-direction: column; gap: 10px; }
-    #addDateButton { width: 150px; padding: 8px; background-color: var(--primary); color: #fff; border: none; border-radius: 4px; cursor: pointer; }
-    #addDateButton:hover { background-color: #253F3F; }
-    .dinner-form button[type="submit"] { width: 150px; padding: 10px; background-color: var(--primary); color: #fff; border: none; border-radius: 4px; cursor: pointer; }
-    .dinner-form button[type="submit"]:hover { background-color: #253F3F; }
-
-    .dinner-list { display: flex; flex-direction: column; gap: 15px; }
-    .dinner-card {
-      border: 1px solid #ddd;
+    form {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px,1fr));
+      gap: 16px;
+    }
+    .form-group {
+      display: flex; flex-direction: column;
+    }
+    .form-group label {
+      margin-bottom: 6px; font-weight: 600; color: var(--text);
+    }
+    .form-group input,
+    .form-group textarea,
+    .form-group button {
+      padding: 8px;
+      font-size: 14px;
+      border: 1px solid #ccc;
       border-radius: 4px;
-      padding: 10px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      background: var(--input-bg);
     }
-    .dinner-card img {
-      width: 100%;
-      height: auto;
+    .form-group textarea { resize: vertical; min-height: 80px; }
+
+    #dateContainer {
+      display: flex; flex-wrap: wrap; gap: 8px;
+    }
+    #addDateButton {
+      grid-column: 1 / -1;
+      background: var(--primary);
+      color: #fff;
+      border: none;
+      padding: 8px;
+      cursor: pointer;
+      transition: background .2s;
+    }
+    #addDateButton:hover {
+      background: #253F3F;
+    }
+
+    .submit-btn {
+      grid-column: 1 / -1;
+      background: var(--primary);
+      color: #fff;
+      border: none;
+      padding: 10px 16px;
+      font-size: 15px;
+      cursor: pointer;
       border-radius: 4px;
-      margin-bottom: 8px;
+      transition: background .2s;
     }
-    .dinner-card h3 { margin: 0 0 5px; font-size: 16px; color: var(--primary); }
-    .dinner-card p { margin: 3px 0; font-size: 14px; line-height: 1.4; }
-    .dinner-card button { margin-top: 5px; background-color: var(--secondary); border: none; color: #333; padding: 6px 10px; border-radius: 4px; cursor: pointer; }
-    .dinner-card button:hover { background-color: var(--secondary-focus); }
+    .submit-btn:hover {
+      background: #253F3F;
+    }
   </style>
 </head>
 <body>
-<header>
-  <div class="logo">社交餐飲平台</div>
-  <nav>
-    <ul>
-      <li><a href="dashboard.html">瀏覽店家</a></li>
-      <li><a href="profile.html">個人資料</a></li>
-      <li><a href="dinners.html" class="active">我的餐會</a></li>
-      <li><a href="reservations.html">我的預訂</a></li>
-      <li><a href="notifications.html">通知</a></li>
-    </ul>
-  </nav>
-  <div class="logout-container">
-    <button id="logoutButton">登出</button>
-  </div>
-</header>
+<div class="container">
+  <header>
+    <div class="logo">社交餐飲平台</div>
+    <nav>
+      <ul>
+        <li><a href="dashboard.html">瀏覽店家</a></li>
+        <li><a href="profile.html">個人資料</a></li>
+        <li><a href="dinners.html" class="active">我的餐會</a></li>
+        <li><a href="reservations.html">我的預訂</a></li>
+        <li><a href="notifications.html">通知</a></li>
+      </ul>
+    </nav>
+  </header>
+  <div class="main">
+    <div class="tabs">
+      <button id="applyTab" class="active">申請餐會</button>
+      <button id="viewTab">查看餐會</button>
+    </div>
 
-<div class="main-container">
-  <div class="inner-tabs">
-    <button id="applyTab" class="active">申請餐會</button>
-    <button id="viewTab">查看餐會</button>
-  </div>
+    <!-- 申請餐會表單 -->
+    <form id="applyDinnerForm" enctype="multipart/form-data">
+      <div class="form-group">
+        <label for="dinnerTitle">餐會名稱</label>
+        <input type="text" id="dinnerTitle" name="dinnerTitle" placeholder="請輸入餐會名稱" required />
+      </div>
 
-  <!-- 申請餐會 -->
-  <div id="applyContent" class="tab-content active dinner-form">
-    <h2>申請餐會</h2>
-    <form id="applyDinnerForm">
-      <label for="dinnerTitle">餐會名稱</label>
-      <input type="text" id="dinnerTitle" name="title" placeholder="請輸入餐會名稱" required />
-
-      <label>可舉辦日期</label>
-      <div id="dateContainer">
-        <input type="date" name="availableDates[]" required />
+      <div class="form-group">
+        <label>可舉辦日期</label>
+        <div id="dateContainer">
+          <input type="date" name="dinnerDates[]" required />
+        </div>
       </div>
       <button type="button" id="addDateButton">添加日期</button>
 
-      <!-- 地址三階段自動完成 -->
-      <label for="dinnerCountry">國家</label>
-      <input list="countryList" id="dinnerCountry" name="country" placeholder="輸入或選擇國家" required autocomplete="off" />
-      <datalist id="countryList">
-        <option value="台灣">
-        <option value="日本">
-        <option value="美國">
-      </datalist>
+      <div class="form-group">
+        <label for="dinnerPublicAddress">公開地址 (到區)</label>
+        <input type="text" id="dinnerPublicAddress" name="dinnerPublicAddress" placeholder="例如：台灣 台北市 中山區" required />
+      </div>
+      <div class="form-group">
+        <label for="dinnerFullAddress">完整地址</label>
+        <input type="text" id="dinnerFullAddress" name="dinnerFullAddress" placeholder="詳細地址，如街道門牌" required />
+      </div>
 
-      <label for="dinnerCity">縣市</label>
-      <input list="cityList" id="dinnerCity" name="city" placeholder="請先選國家" required autocomplete="off" disabled />
-      <datalist id="cityList"></datalist>
+      <div class="form-group">
+        <label for="dinnerPeople">預計人數</label>
+        <input type="number" id="dinnerPeople" name="dinnerPeople" placeholder="請輸入預計人數" min="1" required />
+      </div>
+      <div class="form-group">
+        <label for="dinnerCuisine">料理類型</label>
+        <input type="text" id="dinnerCuisine" name="dinnerCuisine" placeholder="請輸入料理類型" required />
+      </div>
 
-      <label for="dinnerDistrict">區</label>
-      <input list="districtList" id="dinnerDistrict" name="district" placeholder="請先選縣市" required autocomplete="off" disabled />
-      <datalist id="districtList"></datalist>
+      <div class="form-group">
+        <label for="dinnerCover">封面照片</label>
+        <input type="file" id="dinnerCover" name="dinnerCover" accept="image/*" required />
+      </div>
+      <div class="form-group">
+        <label for="dinnerImages">其他照片</label>
+        <input type="file" id="dinnerImages" name="dinnerImages" accept="image/*" multiple />
+      </div>
 
-      <label for="dinnerCuisine">料理類型</label>
-      <input type="text" id="dinnerCuisine" name="cuisine" placeholder="請輸入料理類型" required />
+      <div class="form-group" style="grid-column:1/-1">
+        <label for="dinnerDescription">簡介</label>
+        <textarea id="dinnerDescription" name="dinnerDescription" placeholder="請輸入餐會簡介"></textarea>
+      </div>
 
-      <label for="dinnerPeople">預計人數</label>
-      <input type="number" id="dinnerPeople" name="capacity" placeholder="請輸入預計人數" min="1" required />
-
-      <label for="dinnerImage">餐會圖片</label>
-      <input type="file" id="dinnerImage" name="image" accept="image/*" required />
-
-      <label for="dinnerDescription">簡介</label>
-      <textarea id="dinnerDescription" name="description" placeholder="請輸入餐會簡介"></textarea>
-
-      <button type="submit">申請餐會</button>
+      <button type="submit" class="submit-btn">申請餐會</button>
     </form>
-  </div>
-
-  <!-- 查看餐會 -->
-  <div id="viewContent" class="tab-content dinner-list">
-    <h2>查看餐會</h2>
+    <!-- /申請餐會表單 -->
   </div>
 </div>
 
 <script>
-  // 地址自動完成示範資料，可改為呼叫 API
-  const addressData = {
-    "台灣": { "台北市": ["中正區","大同區","中山區","松山區"], "新北市": ["板橋區","三重區"] },
-    "日本": { "東京都": ["千代田區","新宿區"], "大阪府": ["北區","中央區"] },
-    "美國": { "California": ["Los Angeles","San Francisco"], "New York": ["Manhattan","Brooklyn"] }
-  };
-  const countryInput = document.getElementById('dinnerCountry');
-  const cityInput = document.getElementById('dinnerCity');
-  const districtInput = document.getElementById('dinnerDistrict');
-  const cityList = document.getElementById('cityList');
-  const districtList = document.getElementById('districtList');
+  // 分頁切換
+  const applyTab = document.getElementById('applyTab');
+  const viewTab  = document.getElementById('viewTab');
+  const form = document.getElementById('applyDinnerForm');
+  applyTab.onclick = () => { applyTab.classList.add('active'); viewTab.classList.remove('active'); form.style.display='grid'; };
+  viewTab.onclick  = () => { viewTab.classList.add('active'); applyTab.classList.remove('active'); form.style.display='none'; loadMyDinners(); };
 
-  countryInput.addEventListener('input', () => {
-    const c = countryInput.value;
-    if (addressData[c]) {
-      cityInput.disabled = false;
-      cityList.innerHTML = Object.keys(addressData[c]).map(city => `<option value="${city}">`).join('');
-    } else {
-      cityInput.value = '';
-      cityInput.disabled = true;
-      districtInput.value = '';
-      districtInput.disabled = true;
-    }
-  });
-  cityInput.addEventListener('input', () => {
-    const ctr = countryInput.value;
-    const cty = cityInput.value;
-    if (addressData[ctr] && addressData[ctr][cty]) {
-      districtInput.disabled = false;
-      districtList.innerHTML = addressData[ctr][cty].map(dist => `<option value="${dist}">`).join('');
-    } else {
-      districtInput.value = '';
-      districtInput.disabled = true;
-    }
-  });
-
-  document.getElementById("logoutButton").addEventListener("click", () => {
-    localStorage.removeItem("loggedInUser");
-    location.href = "index.html";
-  });
-
-  const applyTab = document.getElementById("applyTab"),
-          viewTab = document.getElementById("viewTab"),
-          applyContent = document.getElementById("applyContent"),
-          viewContent = document.getElementById("viewContent");
-
-  applyTab.onclick = () => {
-    applyTab.classList.add("active");
-    viewTab.classList.remove("active");
-    applyContent.classList.add("active");
-    viewContent.classList.remove("active");
-  };
-  viewTab.onclick = () => {
-    viewTab.classList.add("active");
-    applyTab.classList.remove("active");
-    viewContent.classList.add("active");
-    applyContent.classList.remove("active");
-    loadMyDinners();
+  // 新增日期
+  document.getElementById('addDateButton').onclick = () => {
+    const inp = document.createElement('input');
+    inp.type = 'date'; inp.name = 'dinnerDates[]'; inp.required = true;
+    document.getElementById('dateContainer').appendChild(inp);
   };
 
-  document.getElementById("addDateButton").onclick = () => {
-    const input = document.createElement("input");
-    input.type = "date";
-    input.name = "availableDates[]";
-    document.getElementById("dateContainer").appendChild(input);
-  };
-
-  document.getElementById("applyDinnerForm").addEventListener("submit", async e => {
+  // 提交
+  document.getElementById('applyDinnerForm').addEventListener('submit', async e => {
     e.preventDefault();
-    const userEmail = localStorage.getItem("loggedInUser");
-    if (!userEmail) { alert("請先登入！"); return; }
+    const userEmail = localStorage.getItem('loggedInUser');
+    if (!userEmail) { alert('請先登入！'); return; }
 
     const data = {
       ownerEmail: userEmail,
-      title: document.getElementById("dinnerTitle").value,
-      availableDates: Array.from(document.querySelectorAll("input[name='availableDates[]']")).filter(i=>i.value).map(i=>i.value),
-      cuisine: document.getElementById("dinnerCuisine").value,
-      capacity: Number(document.getElementById("dinnerPeople").value),
-      description: document.getElementById("dinnerDescription").value,
-      country: document.getElementById("dinnerCountry").value,
-      city: document.getElementById("dinnerCity").value,
-      district: document.getElementById("dinnerDistrict").value
+      title: document.getElementById('dinnerTitle').value,
+      availableDates: Array.from(document.querySelectorAll("input[name='dinnerDates[]']")).map(i=>i.value),
+      publicAddress: document.getElementById('dinnerPublicAddress').value,
+      fullAddress: document.getElementById('dinnerFullAddress').value,
+      cuisine: document.getElementById('dinnerCuisine').value,
+      capacity: Number(document.getElementById('dinnerPeople').value),
+      description: document.getElementById('dinnerDescription').value
     };
 
     const formData = new FormData();
-    formData.append("data", new Blob([JSON.stringify(data)], { type: "application/json" }));
-    const imgFile = document.getElementById("dinnerImage").files[0];
-    if (imgFile) formData.append("image", imgFile);
+    formData.append('data', new Blob([JSON.stringify(data)], {type:'application/json'}));
+    formData.append('cover', document.getElementById('dinnerCover').files[0]);
+    Array.from(document.getElementById('dinnerImages').files).forEach(f=>formData.append('images',f));
 
     try {
-      const res = await fetch("http://localhost:8081/api/dinner/apply", { method: "POST", body: formData });
+      const res = await fetch('http://localhost:8081/api/dinner/apply', { method:'POST', body: formData });
       if (!res.ok) throw new Error(await res.text());
-      alert("申請成功！");
-      document.getElementById("applyDinnerForm").reset();
-      document.getElementById("dateContainer").innerHTML = '<input type="date" name="availableDates[]" required />';
+      alert('申請成功！');
+      form.reset();
+      document.getElementById('dateContainer').innerHTML = '<input type="date" name="dinnerDates[]" required />';
     } catch (err) {
-      alert("申請失敗：" + err.message);
+      alert('申請失敗：'+err.message);
     }
   });
-
-  async function loadMyDinners() {
-    viewContent.innerHTML = "<h2>查看餐會</h2><p>載入中...</p>";
-    const email = localStorage.getItem("loggedInUser");
-    if (!email) { viewContent.innerHTML += "<p>尚未登入</p>"; return; }
-
-    try {
-      const res = await fetch(`http://localhost:8081/api/dinner/my?email=${encodeURIComponent(email)}`);
-      if (!res.ok) throw new Error(await res.text());
-      const dinners = await res.json();
-      if (dinners.length === 0) {
-        viewContent.innerHTML = "<h2>查看餐會</h2><p>您尚未申請任何餐會。</p>";
-        return;
-      }
-      viewContent.innerHTML = "<h2>查看餐會</h2>" + dinners.map(d => `
-        <div class="dinner-card" id="card-${d.id}">
-          <img src="http://localhost:8081/api/dinner/image/${d.imagePath}" alt="${d.title}" />
-          <h3>${d.title}</h3>
-          <p>地點：${d.address.fullAddress}</p>
-          <p>日期：${d.availableDates.join(", ")}</p>
-          <p>人數上限：${d.capacity}</p>
-          <p>料理類型：${d.cuisine}</p>
-          <p>簡介：${d.description || "—"}</p>
-          <button onclick="deleteDinner(${d.id})">刪除</button>
-        </div>
-      `).join("");
-    } catch (err) {
-      viewContent.innerHTML = `<h2>查看餐會</h2><p style="color:red;">載入失敗：${err.message}</p>`;
-    }
-  }
-
-  async function deleteDinner(id) {
-    if (!confirm("確定要刪除此餐會？")) return;
-    const email = localStorage.getItem("loggedInUser");
-    try {
-      const res = await fetch(`http://localhost:8081/api/dinner/${id}?email=${encodeURIComponent(email)}`, { method: "DELETE" });
-      if (!res.ok) throw new Error(await res.text());
-      document.getElementById(`card-${id}`).remove();
-      alert("刪除成功！");
-    } catch (err) {
-      alert("刪除失敗：" + err.message);
-    }
-  }
-
-  // 初次載入「查看餐會」可自動呼叫
-  if (viewTab.classList.contains('active')) {
-    loadMyDinners();
-  }
 </script>
 </body>
 </html>
