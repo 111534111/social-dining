@@ -39,12 +39,17 @@
     }
     .logo { font-size: 24px; font-weight: bold; flex: 1; }
     nav ul {
-      list-style: none; margin: 0; padding: 0;
-      display: flex; gap: 12px;
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      gap: 12px;
     }
     nav a {
-      color: #fff; text-decoration: none;
-      padding: 6px 10px; border-radius: 4px;
+      color: #fff;
+      text-decoration: none;
+      padding: 6px 10px;
+      border-radius: 4px;
       transition: background .2s;
     }
     nav a:hover, nav a.active { background: #dd885f; }
@@ -54,14 +59,18 @@
     }
 
     .tabs {
-      display: flex; gap: 20px;
+      display: flex;
+      gap: 20px;
       border-bottom: 2px solid #eee;
       margin-bottom: 20px;
     }
     .tabs button {
-      background: none; border: none;
-      padding: 8px 12px; font-size: 16px;
-      cursor: pointer; border-bottom: 3px solid transparent;
+      background: none;
+      border: none;
+      padding: 8px 12px;
+      font-size: 16px;
+      cursor: pointer;
+      border-bottom: 3px solid transparent;
       transition: color .2s, border-color .2s;
     }
     .tabs button.active {
@@ -75,10 +84,13 @@
       gap: 16px;
     }
     .form-group {
-      display: flex; flex-direction: column;
+      display: flex;
+      flex-direction: column;
     }
     .form-group label {
-      margin-bottom: 6px; font-weight: 600; color: var(--text);
+      margin-bottom: 6px;
+      font-weight: 600;
+      color: var(--text);
     }
     .form-group input,
     .form-group textarea,
@@ -92,7 +104,9 @@
     .form-group textarea { resize: vertical; min-height: 80px; }
 
     #dateContainer {
-      display: flex; flex-wrap: wrap; gap: 8px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
     }
     #addDateButton {
       grid-column: 1 / -1;
@@ -182,7 +196,8 @@
       </div>
       <div class="form-group">
         <label for="dinnerImages">其他照片</label>
-        <input type="file" id="dinnerImages" name="dinnerImages" accept="image/*" multiple />
+        <input type="file" id="dinnerImages" name="images" accept="image/*" multiple/>     <!-- 可改為 images，和後端 @RequestPart("images") 對應 -->
+       
       </div>
 
       <div class="form-group" style="grid-column:1/-1">
@@ -201,13 +216,24 @@
   const applyTab = document.getElementById('applyTab');
   const viewTab  = document.getElementById('viewTab');
   const form = document.getElementById('applyDinnerForm');
-  applyTab.onclick = () => { applyTab.classList.add('active'); viewTab.classList.remove('active'); form.style.display='grid'; };
-  viewTab.onclick  = () => { viewTab.classList.add('active'); applyTab.classList.remove('active'); form.style.display='none'; loadMyDinners(); };
+  applyTab.onclick = () => {
+    applyTab.classList.add('active');
+    viewTab.classList.remove('active');
+    form.style.display = 'grid';
+  };
+  viewTab.onclick = () => {
+    viewTab.classList.add('active');
+    applyTab.classList.remove('active');
+    form.style.display = 'none';
+    loadMyDinners();
+  };
 
   // 新增日期
   document.getElementById('addDateButton').onclick = () => {
     const inp = document.createElement('input');
-    inp.type = 'date'; inp.name = 'dinnerDates[]'; inp.required = true;
+    inp.type = 'date';
+    inp.name = 'dinnerDates[]';
+    inp.required = true;
     document.getElementById('dateContainer').appendChild(inp);
   };
 
@@ -215,12 +241,15 @@
   document.getElementById('applyDinnerForm').addEventListener('submit', async e => {
     e.preventDefault();
     const userEmail = localStorage.getItem('loggedInUser');
-    if (!userEmail) { alert('請先登入！'); return; }
+    if (!userEmail) {
+      alert('請先登入！');
+      return;
+    }
 
     const data = {
       ownerEmail: userEmail,
       title: document.getElementById('dinnerTitle').value,
-      availableDates: Array.from(document.querySelectorAll("input[name='dinnerDates[]']")).map(i=>i.value),
+      availableDates: Array.from(document.querySelectorAll("input[name='dinnerDates[]']")).map(i => i.value),
       publicAddress: document.getElementById('dinnerPublicAddress').value,
       fullAddress: document.getElementById('dinnerFullAddress').value,
       cuisine: document.getElementById('dinnerCuisine').value,
@@ -229,18 +258,21 @@
     };
 
     const formData = new FormData();
-    formData.append('data', new Blob([JSON.stringify(data)], {type:'application/json'}));
+    formData.append('data', new Blob([JSON.stringify(data)], { type: 'application/json' }));
     formData.append('cover', document.getElementById('dinnerCover').files[0]);
-    Array.from(document.getElementById('dinnerImages').files).forEach(f=>formData.append('images',f));
+    Array.from(document.getElementById('dinnerImages').files).forEach(f => formData.append('images', f));
 
     try {
-      const res = await fetch('http://localhost:8081/api/dinner/apply', { method:'POST', body: formData });
+      const res = await fetch('http://localhost:8081/api/dinner/apply', {
+        method: 'POST',
+        body: formData
+      });
       if (!res.ok) throw new Error(await res.text());
       alert('申請成功！');
       form.reset();
       document.getElementById('dateContainer').innerHTML = '<input type="date" name="dinnerDates[]" required />';
     } catch (err) {
-      alert('申請失敗：'+err.message);
+      alert('申請失敗：' + err.message);
     }
   });
 </script>
