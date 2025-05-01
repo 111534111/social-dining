@@ -5,59 +5,31 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>社交餐飲平台 - 瀏覽餐會</title>
     <style>
-        body {
-            margin: 0;
-            padding: 0;
-            font-family: Arial, sans-serif;
-            background-color: #f2f2f2;
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-        }
-        header {
-            display: flex;
-            align-items: center;
-            background-color: #f58549;
-            color: #fff;
-            padding: 10px 20px;
-        }
-        .logo { font-size: 24px; font-weight: bold; margin-right: 40px; }
-        nav ul { list-style: none; display: flex; gap: 15px; margin: 0; padding: 0; }
-        nav a { text-decoration: none; color: #fff; background-color: #f7a573; padding: 10px 18px; border-radius: 4px; }
-        nav a:hover, nav a.active { background-color: #dd885f; }
-        .logout-container { margin-left: auto; }
-        .logout-container button {
-            background-color: #e23b3b; border: none; color: #fff; padding: 10px 18px; cursor: pointer; border-radius: 4px;
-        }
-        .logout-container button:hover { background-color: #b72f2f; }
+        body { margin:0; padding:0; font-family:Arial,sans-serif; background:#f2f2f2; display:flex; flex-direction:column; min-height:100vh; }
+        header { display:flex; align-items:center; background:#f58549; color:#fff; padding:10px 20px; }
+        .logo { font-size:24px; font-weight:bold; margin-right:40px; }
+        nav ul { list-style:none; display:flex; gap:15px; margin:0; padding:0; }
+        nav a { text-decoration:none; color:#fff; background:#f7a573; padding:10px 18px; border-radius:4px; }
+        nav a:hover, nav a.active { background:#dd885f; }
+        .logout-container { margin-left:auto; }
+        .logout-container button { background:#e23b3b; border:none; color:#fff; padding:10px 18px; cursor:pointer; border-radius:4px; }
+        .logout-container button:hover { background:#b72f2f; }
 
-        .main-content {
-            width: 90%; max-width: 1200px; margin: 20px auto; padding: 20px;
-            background: #fff; border-radius: 8px; box-shadow: 0 0 8px rgba(0,0,0,0.1); flex: 1;
-        }
-        .main-content h2 { margin-top: 0; }
+        .main-content { width:90%; max-width:1200px; margin:20px auto; padding:20px; background:#fff; border-radius:8px; box-shadow:0 0 8px rgba(0,0,0,0.1); flex:1; }
+        .main-content h2 { margin-top:0; }
 
-        .card-list {
-            display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 15px; margin-top: 20px;
-        }
-        .card {
-            background-color: #fafafa; border: 1px solid #eee; border-radius: 6px; padding: 15px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-        .card img {
-            width: 100%;
-            height: auto;
-            border-radius: 4px;
-            margin-bottom: 8px;
-        }
-        .card h3 { margin: 0 0 8px; font-size: 18px; }
-        .card p  { margin: 0; font-size: 14px; line-height: 1.4; }
-        .card button {
-            margin-top: 10px; background-color: #f7a573; border: none; color: #fff;
-            padding: 8px 14px; cursor: pointer; font-size: 14px; border-radius: 4px;
-        }
-        .card button:hover { background-color: #dd885f; }
+        .filters { display:flex; flex-wrap:wrap; gap:10px; margin:20px 0; }
+        .filters select, .filters input[type=date] { padding:8px; font-size:14px; border:1px solid #ccc; border-radius:4px; background:#fff; }
 
-        footer { text-align: center; padding: 10px; background-color: #f2f2f2; font-size: 14px; color: #888; }
+        .card-list { display:grid; grid-template-columns:repeat(auto-fill,minmax(250px,1fr)); gap:15px; margin-top:20px; }
+        .card { background:#fafafa; border:1px solid #eee; border-radius:6px; padding:15px; box-shadow:0 2px 4px rgba(0,0,0,0.1); display:flex; flex-direction:column; }
+        .card img { width:100%; height:auto; border-radius:4px; margin-bottom:8px; }
+        .card h3 { margin:0 0 8px; font-size:18px; }
+        .card p { margin:4px 0; font-size:14px; line-height:1.4; }
+        .card button { margin-top:auto; background:#f7a573; border:none; color:#fff; padding:8px 14px; cursor:pointer; font-size:14px; border-radius:4px; }
+        .card button:hover { background:#dd885f; }
+
+        footer { text-align:center; padding:10px; background:#f2f2f2; font-size:14px; color:#888; }
     </style>
 </head>
 <body>
@@ -79,45 +51,100 @@
 
 <div class="main-content">
     <h2>所有公開餐會</h2>
-    <p>以下列出平台目前可報名的餐會。</p>
+    <p>以下列出平台目前可報名的餐會，您也可以根據地區或日期進行篩選：</p>
+    <div class="filters">
+        <select id="filterCountry"><option value="all">所有國家</option></select>
+        <select id="filterCity"><option value="all">所有縣市</option></select>
+        <select id="filterDistrict"><option value="all">所有區</option></select>
+        <input type="date" id="filterDate">
+    </div>
     <div id="dinnerList" class="card-list"></div>
 </div>
 
 <footer>© 2025 社交餐飲平台</footer>
 
 <script>
+    // 登出
     document.getElementById("logoutButton").onclick = () => {
         localStorage.removeItem("loggedInUser");
         location.href = "index.html";
     };
 
-    async function loadAllDinners() {
-        const listDiv = document.getElementById("dinnerList");
-        listDiv.innerHTML = "<p>載入中...</p>";
-        try {
-            const res = await fetch("http://localhost:8081/api/dinner/all");
-            if (!res.ok) throw new Error(await res.text());
-            const dinners = await res.json();
-            if (dinners.length === 0) {
-                listDiv.innerHTML = "<p>目前沒有公開餐會。</p>";
-                return;
-            }
-            listDiv.innerHTML = dinners.map(d => `
-              <div class="card">
-                <img src="http://localhost:8081/api/dinner/image/${d.imagePath}" alt="${d.title}" />
-                <h3>${d.title}</h3>
-                <p>地點：${d.location}</p>
-                <p>日期：${(d.availableDates||[]).join(', ')}</p>
-                <p>人數上限：${d.capacity}</p>
-                <p>料理類型：${d.cuisine}</p>
-                <p>簡介：${d.description||'—'}</p>
-                <button onclick="alert('之後可跳到報名／詳情，餐會ID=${d.id}')">查看詳情</button>
-              </div>
-            `).join("");
+    let allDinners = [];
+    const listDiv = document.getElementById("dinnerList");
+    const fCountry = document.getElementById("filterCountry");
+    const fCity = document.getElementById("filterCity");
+    const fDistrict = document.getElementById("filterDistrict");
+    const fDate = document.getElementById("filterDate");
 
+    async function loadAllDinners() {
+        try {
+            const res = await fetch("/api/dinner/all");
+            allDinners = await res.json();
+            populateCountry(); renderList();
         } catch (err) {
-            listDiv.innerHTML = `<p style="color:red;">載入失敗：${err.message}</p>`;
+            listDiv.innerHTML = `<p style='color:red;'>載入失敗：${err.message}</p>`;
         }
+    }
+
+    function populateCountry() {
+        const set = new Set();
+        allDinners.forEach(d => {
+            const p = (d.publicAddress||"").split(' ');
+            if (p[0]) set.add(p[0]);
+        });
+        fCountry.innerHTML = '<option value="all">所有國家</option>';
+        set.forEach(c => fCountry.append(new Option(c, c)));
+    }
+    fCountry.onchange = () => {
+        const sc = fCountry.value;
+        const ciSet = new Set();
+        allDinners.forEach(d => {
+            const p = (d.publicAddress||"").split(' ');
+            if (sc==='all' || p[0]===sc) ciSet.add(p[1]);
+        });
+        fCity.innerHTML = '<option value="all">所有縣市</option>';
+        ciSet.forEach(c => fCity.append(new Option(c, c)));
+        fDistrict.innerHTML = '<option value="all">所有區</option>';
+        renderList();
+    };
+    fCity.onchange = () => {
+        const sc = fCountry.value, sy = fCity.value;
+        const diSet = new Set();
+        allDinners.forEach(d => {
+            const p = (d.publicAddress||"").split(' ');
+            if ((sc==='all'||p[0]===sc) && (sy==='all'||p[1]===sy)) diSet.add(p[2]);
+        });
+        fDistrict.innerHTML = '<option value="all">所有區</option>';
+        diSet.forEach(dist => fDistrict.append(new Option(dist, dist)));
+        renderList();
+    };
+    fDistrict.onchange = renderList;
+    fDate.onchange = renderList;
+
+    function renderList() {
+        const sc=fCountry.value, sy=fCity.value, sd=fDistrict.value, selDate=fDate.value;
+        const fil = allDinners.filter(d => {
+            const p = (d.publicAddress||"").split(' ');
+            const okLoc = (sc==='all'||p[0]===sc) && (sy==='all'||p[1]===sy) && (sd==='all'||p[2]===sd);
+            const okDate = !selDate || (d.availableDates||[]).includes(selDate);
+            return okLoc && okDate;
+        });
+        if (!fil.length) {
+            listDiv.innerHTML = '<p>無符合條件的餐會。</p>';
+            return;
+        }
+        listDiv.innerHTML = fil.map(d => `
+      <div class="card">
+        <img src="/api/dinner/image/${d.coverImagePath}" alt="${d.title}" />
+        <h3>${d.title}</h3>
+        <p>地點：${d.publicAddress}</p>
+        <p>日期：${d.availableDates.join(', ')}</p>
+        <p>料理：${d.cuisine}</p>
+        <p>人數：${d.capacity}</p>
+        <button onclick="location.href='detail.html?id=${d.id}'">查看詳情</button>
+      </div>
+    `).join('');
     }
 
     loadAllDinners();

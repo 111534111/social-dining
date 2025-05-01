@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>餐會詳情 - 社交餐飲平台</title>
+  <style>
+    body { margin:0; padding:0; font-family:Arial,sans-serif; background:#f2f2f2; display:flex; flex-direction:column; min-height:100vh; }
+    header { display:flex; align-items:center; background:#f58549; color:#fff; padding:10px 20px; }
+    .logo { font-size:24px; font-weight:bold; margin-right:40px; }
+    nav ul { list-style:none; display:flex; gap:15px; margin:0; padding:0; }
+    nav a { text-decoration:none; color:#fff; background:#f7a573; padding:10px 18px; border-radius:4px; }
+    nav a:hover, nav a.active { background:#dd885f; }
+    .back-button { margin-left:auto; background:#fff; color:#f58549; border:none; padding:6px 12px; border-radius:4px; cursor:pointer; font-weight:bold; }
+    .back-button:hover { background:#fde3d2; }
+    .content { width:90%; max-width:800px; margin:20px auto; background:#fff; border-radius:8px; padding:20px; box-shadow:0 0 8px rgba(0,0,0,0.1); flex:1; }
+    .cover { width:100%; height:300px; object-fit:cover; border-radius:6px; margin-bottom:16px; }
+    .fields p { margin:8px 0; font-size:16px; }
+    .fields strong { color:#2D4C4C; }
+    /* 圖片走馬燈 */
+    .image-carousel { position:relative; width:100%; height:300px; overflow:hidden; margin-top:16px; }
+    .carousel-track { display:flex; transition:transform 0.4s ease; }
+    .carousel-track img { width:100%; height:300px; object-fit:cover; flex-shrink:0; }
+    .carousel-btn { position:absolute; top:50%; transform:translateY(-50%); background:rgba(0,0,0,0.4); border:none; color:#fff; width:40px; height:40px; cursor:pointer; border-radius:50%; display:flex; align-items:center; justify-content:center; }
+    .carousel-btn.prev { left:10px; }
+    .carousel-btn.next { right:10px; }
+    #orderBtn { display:block; margin:20px auto 0; padding:10px 20px; background:#2D4C4C; color:#fff; border:none; border-radius:4px; cursor:pointer; }
+    #orderBtn:hover { background:#253F3F; }
+    footer { text-align:center; padding:10px; background:#f2f2f2; font-size:14px; color:#888; }
+  </style>
+</head>
+<body>
+<header>
+  <div class="logo">社交餐飲平台</div>
+  <nav>
+    <ul>
+      <li><a href="dashboard.html">瀏覽餐會</a></li>
+      <li><a href="profile.html">個人資料</a></li>
+      <li><a href="dinners.html">我的餐會</a></li>
+      <li><a href="reservations.html">我的預訂</a></li>
+      <li><a href="notifications.html">通知</a></li>
+    </ul>
+  </nav>
+  <button class="back-button" onclick="history.back()">&larr; 返回</button>
+</header>
+
+<div class="content" id="detailContent">
+  <p>載入中...</p>
+</div>
+
+<footer>© 2025 社交餐飲平台</footer>
+
+<script>
+  const params = new URLSearchParams(location.search);
+  const id = params.get('id');
+  const contentEl = document.getElementById('detailContent');
+
+  async function loadDetail() {
+    if (!id) {
+      contentEl.innerHTML = '<p style="color:red;">找不到餐會ID。</p>';
+      return;
+    }
+    try {
+      const res = await fetch(`/api/dinner/${id}`);
+      if (!res.ok) throw new Error(await res.text());
+      const d = await res.json();
+      contentEl.innerHTML = `
+          <h2>${d.title}</h2>
+          <img src="/api/dinner/image/${d.coverImagePath}" alt="封面" class="cover">
+          <div class="fields">
+            <p><strong>公開地址：</strong>${d.publicAddress}</p>
+            <p><strong>日期：</strong>${d.availableDates.join('，')}</p>
+            <p><strong>料理：</strong>${d.cuisine}</p>
+            <p><strong>人數上限：</strong>${d.capacity}</p>
+            <p><strong>電話：</strong>${d.phone || '—'}</p>
+            <p><strong>簡介：</strong>${d.description || '—'}</p>
+          </div>
+          <div class="image-carousel">
+            <button class="carousel-btn prev">&#9664;</button>
+            <div class="carousel-track" id="carouselTrack">
+              ${(d.imagePaths||[]).map(img => `<img src="/api/dinner/image/${img}" alt="其他照片">`).join('')}
+            </div>
+            <button class="carousel-btn next">&#9654;</button>
+          </div>
+          <button id="orderBtn">下訂</button>
+        `;
+      setupCarousel(d.imagePaths.length);
+    } catch (err) {
+      contentEl.innerHTML = `<p style="color:red;">載入失敗：${err.message}</p>`;
+    }
+  }
+
+  function setupCarousel(count) {
+    const track = document.getElementById('carouselTrack');
+    const prev = document.querySelector('.carousel-btn.prev');
+    const next = document.querySelector('.carousel-btn.next');
+    let index = 0;
+    const total = count;
+    const container = document.querySelector('.image-carousel');
+    let width;
+    setTimeout(() => { width = container.clientWidth; }, 100);
+    prev.onclick = () => {
+      index = (index - 1 + total) % total;
+      track.style.transform = `translateX(${ -index * width }px)`;
+    };
+    next.onclick = () => {
+      index = (index + 1) % total;
+      track.style.transform = `translateX(${ -index * width }px)`;
+    };
+  }
+
+  document.addEventListener('DOMContentLoaded', loadDetail);
+</script>
+</body>
+</html>

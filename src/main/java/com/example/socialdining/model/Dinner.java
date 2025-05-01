@@ -21,7 +21,7 @@ public class Dinner {
 
     // 完整地址，只在訂購完成後顯示
     private String fullAddress;
-
+    private String phone;
     private String cuisine;
     private Integer capacity;
 
@@ -44,4 +44,6 @@ public class Dinner {
 
     @ManyToOne @JoinColumn(name = "user_id", nullable = false)
     private User owner;
+    public String getPhone() { return phone; }
+    public void setPhone(String phone) { this.phone = phone; }
 }
